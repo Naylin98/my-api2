@@ -30,7 +30,7 @@ app.get("/api/blocks54", async (req, res) => {
       console.log(`Block ${curr.number} diff: ${diff}s`);
 
       // 🔹 54 sec ± tolerance
-      if (diff >= 54 - tolerance && diff <= 54 + tolerance) {
+      if (diff === 54) {
         const lastDigit = curr.number % 10;
         const BS = lastDigit <= 4 ? "S" : "B";
         const Color = lastDigit <= 4 ? "Green" : "Red";
