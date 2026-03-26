@@ -44,7 +44,8 @@ app.get("/api/blocks54", async (req, res) => {
           hash: curr.hash,
           Lastdigit: lastDigit,
           "B/S": BS,
-          Color
+          Color,
+          timestamp: curr.timestamp
         });
       }
     }
