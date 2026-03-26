@@ -38,15 +38,18 @@ app.get("/api/blocks54", async (req, res) => {
         const IssueNumber = `${dateStr}0123${String(seq).padStart(4,"0")}`;
         seq = seq < 1440 ? seq + 1 : 1;
 
-        result.push({
-          IssueNumber,
-          Blocknumber: curr.number,
-          hash: curr.hash,
-          Lastdigit: lastDigit,
-          "B/S": BS,
-          Color,
-          timestamp: curr.timestamp
-        });
+        const ts = new Date(curr.timestamp);
+    const humanTimestamp = `${ts.getFullYear()}-${String(ts.getMonth()+1).padStart(2,"0")}-${String(ts.getDate()).padStart(2,"0")} ${String(ts.getHours()).padStart(2,"0")}:${String(ts.getMinutes()).padStart(2,"0")}:${String(ts.getSeconds()).padStart(2,"0")}`;
+
+    result.push({
+      IssueNumber,
+      Blocknumber: curr.number,
+      hash: curr.hash,
+      timestamp: humanTimestamp, // 🔹 human readable
+      Lastdigit: lastDigit,
+      "B/S": BS,
+      Color
+    });
       }
     }
 
@@ -59,10 +62,11 @@ app.get("/api/blocks54", async (req, res) => {
           IssueNumber: `${dateStr}0123${String(i+1).padStart(4,"0")}`,
           Blocknumber: blocks[i].number,
           hash: blocks[i].hash,
+          timestamp: humanTimestamp,
           Lastdigit: lastDigit,
           "B/S": lastDigit <= 4 ? "S" : "B",
-          Color: lastDigit <= 4 ? "Green" : "Red",
-          timestamp: curr.timestamp
+          Color: lastDigit <= 4 ? "Green" : "Red"
+          
         });
       }
     }
