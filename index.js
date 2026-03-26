@@ -75,11 +75,11 @@ async function updateBlocks() {
       let Color = "";
 
   if (last=== 0 || last === 5) {
-    Color = "ခရမ်း"; // ခရမ်း
+    Color = "Purple"; // ခရမ်း
   } else if ([1, 3, 7, 9].includes(last)) {
-    Color = "အစိမ်း"; // အစိမ်း
+    Color = "Greenး"; // အစိမ်း
   } else if ([2, 4, 6, 8].includes(last)) {
-    Color = "အနီ"; // အနီ
+    Color = "Red"; // အနီ
   }
 
       
@@ -119,20 +119,11 @@ async function updateBlocks() {
   }
 }
 
-let isRunning = false;
-
-async function safeUpdate() {
-  if (isRunning) return;
-  isRunning = true;
-
-  await updateBlocks();
-
-  isRunning = false;
-}
-
-setInterval(safeUpdate, 3000);
-safeUpdate();
-
+setInterval(async () => {
+  const res = await fetch("https://my-api2-r6dn.onrender.com/api/blocks54");
+  const data = await res.json();
+  console.log(data);
+}, 3000);
 // 🔹 API endpoint
 app.get("/api/blocks54", (req, res) => {
   res.json({
