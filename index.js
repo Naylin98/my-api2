@@ -34,9 +34,8 @@ async function updateBlocks() {
       // ✅ prevent duplicates
       if (existingNumbers.has(block.number)) return;
 
-      // 🔥 BEST: use block number
-      const last = block.number % 10;
-
+      const digits = block.hash.replace(/\D/g, "");
+const last = parseInt(digits.slice(-1));
       const BS = last <= 4 ? "S" : "B";
 
       let color = "";
