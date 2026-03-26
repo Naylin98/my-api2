@@ -32,8 +32,10 @@ async function updateBlocks() {
 
       if (existingNumbers.has(block.number)) return;
 
-      const lastDigit = block.hash.replace(/\D/g, "");
-      const last = lastDigit.slice(-1);
+            const digits = (block.hash || "").replace(/\D/g, "");
+if (!digits) return;
+
+const last = parseInt(digits.slice(-1)); // ✅ final digit (0-9)
       const BS = last <= 4 ? "S" : "B";
       import express from "express";
 import cors from "cors";
@@ -102,7 +104,7 @@ if (last === 0 || last === 5) {
         Blocknumber: block.number,
         hash: block.hash,
         timestamp: humanTimestamp,
-        Lastdigit: lastDigit,
+        Lastdigit: last,
         "B/S": BS,
         Color : color
       });
