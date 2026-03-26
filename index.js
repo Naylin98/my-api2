@@ -59,7 +59,7 @@ async function updateBlocks() {
     });
 
     // 🔹 newest on top
-    history = [...newData.reverse(), ...history];
+    history = [...newData, ...history];
 
     // 🔹 keep only 1000
     history = history.slice(0, 1000);
