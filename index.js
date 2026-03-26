@@ -9,26 +9,28 @@ app.get("/api/blocks54", async (req, res) => {
   try {
     const url = "https://apilist.tronscanapi.com/api/block?sort=-timestamp&limit=50";
     const response = await fetch(url);
+    if (!response.ok) throw new Error("HTTP error " + response.status);
     const json = await response.json();
     const blocks = json.data || [];
 
-    const tolerance = parseFloat(req.query.tolerance) || 10;
-
+    const tolerance = parseFloat(req.query.tolerance) || 1; // ±tolerance seconds
+    const existingNumbers = new Set(); // prevent duplicates
     let seq = 1;
+
     const d = new Date();
     const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
 
     const result = [];
 
-    // Main loop: check 54-sec ± tolerance
     for (let i = 1; i < blocks.length; i++) {
       const prev = blocks[i - 1];
       const curr = blocks[i];
       const diff = Math.abs(curr.timestamp - prev.timestamp) / 1000;
 
-      console.log(`Block ${curr.number} interval: ${diff}s`);
+      // 🔹 Check 54s ± tolerance
+      if (Math.abs(diff - 54) <= tolerance && !existingNumbers.has(curr.number)) {
+        existingNumbers.add(curr.number);
 
-      if (diff === 54) {
         const lastDigit = curr.number % 10;
         const BS = lastDigit <= 4 ? "S" : "B";
         const Color = lastDigit <= 4 ? "Green" : "Red";
@@ -36,7 +38,6 @@ app.get("/api/blocks54", async (req, res) => {
         const IssueNumber = `${dateStr}0123${String(seq).padStart(4, "0")}`;
         seq = seq < 1440 ? seq + 1 : 1;
 
-        // Human-readable timestamp
         const ts = new Date(curr.timestamp);
         const humanTimestamp = `${ts.getFullYear()}-${String(ts.getMonth()+1).padStart(2,"0")}-${String(ts.getDate()).padStart(2,"0")} ${String(ts.getHours()).padStart(2,"0")}:${String(ts.getMinutes()).padStart(2,"0")}:${String(ts.getSeconds()).padStart(2,"0")}`;
 
@@ -52,17 +53,19 @@ app.get("/api/blocks54", async (req, res) => {
       }
     }
 
-    // Fallback: return all blocks if no 54-sec blocks found
+    // 🔹 Fallback: return all latest blocks if no 54s blocks found
     if (result.length === 0) {
-      console.log("No 54-sec blocks found, returning latest blocks for testing...");
       for (let i = 0; i < blocks.length; i++) {
         const curr = blocks[i];
+        if (existingNumbers.has(curr.number)) continue;
+        existingNumbers.add(curr.number);
+
         const lastDigit = curr.number % 10;
         const ts = new Date(curr.timestamp);
         const humanTimestamp = `${ts.getFullYear()}-${String(ts.getMonth()+1).padStart(2,"0")}-${String(ts.getDate()).padStart(2,"0")} ${String(ts.getHours()).padStart(2,"0")}:${String(ts.getMinutes()).padStart(2,"0")}:${String(ts.getSeconds()).padStart(2,"0")}`;
 
         result.push({
-          IssueNumber: `${dateStr}0123${String(i+1).padStart(4,"0")}`,
+          IssueNumber: `${dateStr}0123${String(seq).padStart(4,"0")}`,
           Blocknumber: curr.number,
           hash: curr.hash,
           timestamp: humanTimestamp,
@@ -70,16 +73,19 @@ app.get("/api/blocks54", async (req, res) => {
           "B/S": lastDigit <= 4 ? "S" : "B",
           Color: lastDigit <= 4 ? "Green" : "Red"
         });
+        seq = seq < 1440 ? seq + 1 : 1;
       }
     }
 
     res.json({ total: result.length, data: result });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
+// Root route
 app.get("/", (req, res) => res.send("TRON API running 🚀"));
 
 const PORT = process.env.PORT || 3000;
