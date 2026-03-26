@@ -61,7 +61,8 @@ app.get("/api/blocks54", async (req, res) => {
           hash: blocks[i].hash,
           Lastdigit: lastDigit,
           "B/S": lastDigit <= 4 ? "S" : "B",
-          Color: lastDigit <= 4 ? "Green" : "Red"
+          Color: lastDigit <= 4 ? "Green" : "Red",
+          timestamp: curr.timestamp
         });
       }
     }
