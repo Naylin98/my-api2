@@ -69,18 +69,20 @@ async function updateBlocks() {
 
       if (existingNumbers.has(block.number)) return;
 
-      const lastDigit = block.hash.replace(/\D/g, "");
-      const last = lastDigit.slice(-1);
-      const BS = last <= 4 ? "S" : "B";
-      let color = "";
+      const digits = (block.hash || "").replace(/\D/g, "");
+if (!digits) return;
 
-  if (last=== 0 || last === 5) {
-    color = "Purple"; // ခရမ်း
-  } else if ([1, 3, 7, 9].includes(last)) {
-    color = "Greenး"; // အစိမ်း
-  } else if ([2, 4, 6, 8].includes(last)) {
-    color = "Red"; // အနီ
-  }
+const last = parseInt(digits.slice(-1)); // ✅ final digit (0-9)
+      const BS = last <= 4 ? "S" : "B";
+     let Color = "";
+
+if (last === 0 || last === 5) {
+  Color = "ခရမ်း";
+} else if ([1, 3, 7, 9].includes(last)) {
+  Color = "အစိမ်း";
+} else if ([2, 4, 6, 8].includes(last)) {
+  Color = "အနီ";
+}
 
       
        
