@@ -19,7 +19,6 @@ async function updateBlocks() {
     const existingNumbers = new Set(history.map(x => x.Blocknumber));
 
     let seq = history.length + 1;
-
     const d = new Date();
     const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
 
@@ -31,21 +30,18 @@ async function updateBlocks() {
       // ✅ only second = 54
       if (timestamp.getSeconds() !== 54) return;
 
-      // ✅ prevent duplicates
       if (existingNumbers.has(block.number)) return;
 
-      const digits = block.hash.replace(/\D/g, "");
-const last = parseInt(digits.slice(-1));
-      const BS = last <= 4 ? "S" : "B";
+      const digits = (block.hash || "").replace(/\D/g, "");
+      if (!digits) return;
 
+      const last = parseInt(digits.slice(-1)); // ✅ final digit (0-9)
+      const BS = last <= 4 ? "S" : "B";
       let color = "";
-      if (last === 0 || last === 5) {
-        color = "ခရမ်း";
-      } else if ([1, 3, 7, 9].includes(last)) {
-        color = "အစိမ်း";
-      } else {
-        color = "အနီ";
-      }
+
+      if (last === 0 || last === 5) color = "ခရမ်း";
+      else if ([1,3,7,9].includes(last)) color = "အစိမ်း";
+      else if ([2,4,6,8].includes(last)) color = "အနီ";
 
       const IssueNumber = `${dateStr}10301${String(seq).padStart(4,"0")}`;
       seq = seq < 1440 ? seq + 1 : 1;
@@ -75,24 +71,38 @@ const last = parseInt(digits.slice(-1));
     // 🔹 keep only 1000
     history = history.slice(0, 1000);
 
-    console.log("Updated:", newData.length);
+    console.log("Updated:", newData.length, "new blocks");
 
   } catch (err) {
     console.error("Update error:", err.message);
   }
 }
 
-// 🔥 Auto refresh every 3 sec
+// 🔥 Auto refresh every 3 seconds
 setInterval(updateBlocks, 3000);
 
-// First run
+// First run immediately
 updateBlocks();
 
-// 🔹 API endpoint
+// 🔹 API endpoint with manual seq override
 app.get("/api/blocks54", (req, res) => {
+  const manualSeq = parseInt(req.query.seq); // ?seq=1234
+
+  const data = history.map((item, index) => {
+    let seqNumber;
+    if (!isNaN(manualSeq)) {
+      seqNumber = (manualSeq + index) % 10000; // rollover 0000-9999
+    } else {
+      seqNumber = parseInt(item.IssueNumber.slice(-4));
+    }
+
+    const newIssueNumber = item.IssueNumber.slice(0, -4) + String(seqNumber).padStart(4,"0");
+    return { ...item, IssueNumber: newIssueNumber };
+  });
+
   res.json({
-    total: history.length,
-    data: history
+    total: data.length,
+    data
   });
 });
 
