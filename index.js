@@ -32,9 +32,20 @@ async function updateBlocks() {
 
       if (existingNumbers.has(block.number)) return;
 
-      const lastDigit = block.number % 10;
+      const lastDigit = block.hashreplace(/\D/g, "");
+      const last = lastDigit.slice(-1);
       const BS = lastDigit <= 4 ? "S" : "B";
-      const Color = lastDigit <= 4 ? "Green" : "Red";
+      const Color =  "";
+
+  if (lastDigit=== 0 || lastDigit === 5) {
+    color = "ခရမ်း"; // ခရမ်း
+  } else if ([1, 3, 7, 9].includes(lastDigit)) {
+    color = "အစိမ်း"; // အစိမ်း
+  } else if ([2, 4, 6, 8].includes(lastDigit)) {
+    color = "အနီ"; // အနီ
+  }
+
+      
        
       const IssueNumber = `${dateStr}10301${String(seq).padStart(4,"0")}`;
       seq = seq < 1440 ? seq + 1 : 1;
