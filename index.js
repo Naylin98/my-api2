@@ -102,7 +102,7 @@ async function updateBlocks() {
         timestamp: humanTimestamp,
         Lastdigit: lastDigit,
         "B/S": BS,
-        Color : Color
+        Color : color
       });
     });
 
