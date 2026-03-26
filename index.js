@@ -119,11 +119,19 @@ async function updateBlocks() {
   }
 }
 
-// 🔥 Auto refresh every 3 seconds
-setInterval(updateBlocks, 3000);
+let isRunning = false;
 
-// First run immediately
-updateBlocks();
+async function safeUpdate() {
+  if (isRunning) return;
+  isRunning = true;
+
+  await updateBlocks();
+
+  isRunning = false;
+}
+
+setInterval(safeUpdate, 3000);
+safeUpdate();
 
 // 🔹 API endpoint
 app.get("/api/blocks54", (req, res) => {
