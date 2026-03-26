@@ -86,19 +86,29 @@ updateBlocks();
 
 // 🔹 API endpoint with manual seq override
 app.get("/api/blocks54", (req, res) => {
-  const manualSeq = parseInt(req.query.seq); // ?seq=1234
+  const manualSeq = parseInt(req.query.seq); // ?seq=1234 override starting point
+  let seqCounter = !isNaN(manualSeq) ? manualSeq : null;
 
   const data = history.map((item, index) => {
     let seqNumber;
-    if (!isNaN(manualSeq)) {
-      seqNumber = (manualSeq + index) % 10000; // rollover 0000-9999
+
+    if (seqCounter !== null) {
+      seqNumber = seqCounter % 10000; // rollover 0000-9999
+      seqCounter++;
     } else {
       seqNumber = parseInt(item.IssueNumber.slice(-4));
     }
 
     const newIssueNumber = item.IssueNumber.slice(0, -4) + String(seqNumber).padStart(4,"0");
+
     return { ...item, IssueNumber: newIssueNumber };
   });
+
+  res.json({
+    total: data.length,
+    data
+  });
+});
 
   res.json({
     total: data.length,
