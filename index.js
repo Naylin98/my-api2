@@ -5,6 +5,9 @@ import fetch from "node-fetch";
 const app = express();
 app.use(cors());
 
+// 🔹 Global storage (memory)
+let history = []; // store last 1000 records
+
 app.get("/api/blocks54", async (req, res) => {
   try {
     const url = "https://apilist.tronscanapi.com/api/block?sort=-number&start=0&limit=50";
@@ -12,47 +15,39 @@ app.get("/api/blocks54", async (req, res) => {
     if (!response.ok) throw new Error("HTTP error " + response.status);
 
     const blocks = (await response.json()).data || [];
-    const existingNumbers = new Set();
-    const result = [];
+    const existingNumbers = new Set(history.map(x => x.Blocknumber));
 
-    // IssueNumber setup
-    let seq = 1;
+    let seq = history.length + 1;
     const d = new Date();
     const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
 
-    // Sort ascending
-    blocks.sort((a, b) => a.number - b.number);
+    const newData = [];
 
     blocks.forEach((block) => {
-      const numberStr = String(block.number || 0);
       const timestamp = new Date(block.timestamp);
 
-      // ✅ exact second = 54 only
+      // ✅ only second = 54
       if (timestamp.getSeconds() !== 54) return;
 
-      // ✅ prevent duplicates
-      if (existingNumbers.has(numberStr)) return;
-      existingNumbers.add(numberStr);
+      // ✅ skip duplicates (already in history)
+      if (existingNumbers.has(block.number)) return;
 
-      // 🔹 Last digit logic
       const lastDigit = block.number % 10;
       const BS = lastDigit <= 4 ? "S" : "B";
       const Color = lastDigit <= 4 ? "Green" : "Red";
 
-      // 🔹 IssueNumber (1 → 1440 reset)
       const IssueNumber = `${dateStr}0123${String(seq).padStart(4,"0")}`;
       seq = seq < 1440 ? seq + 1 : 1;
 
-      // 🔹 Human-readable timestamp
-      const humanTimestamp = timestamp.getFullYear() + "-" +
+      const humanTimestamp =
+        timestamp.getFullYear() + "-" +
         String(timestamp.getMonth()+1).padStart(2,"0") + "-" +
         String(timestamp.getDate()).padStart(2,"0") + " " +
         String(timestamp.getHours()).padStart(2,"0") + ":" +
         String(timestamp.getMinutes()).padStart(2,"0") + ":" +
         String(timestamp.getSeconds()).padStart(2,"0");
 
-      // ✅ Final push (all fields)
-      result.push({
+      newData.push({
         IssueNumber,
         Blocknumber: block.number,
         hash: block.hash,
@@ -63,9 +58,15 @@ app.get("/api/blocks54", async (req, res) => {
       });
     });
 
+    // 🔹 Add new data to TOP
+    history = [...newData.reverse(), ...history];
+
+    // 🔹 Keep only latest 1000
+    history = history.slice(0, 1000);
+
     res.json({
-      total: result.length,
-      data: result
+      total: history.length,
+      data: history
     });
 
   } catch (err) {
