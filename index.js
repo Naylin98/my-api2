@@ -63,7 +63,7 @@ async function updateBlocks() {
         Blocknumber: block.number,
         hash: block.hash,
         timestamp: humanTimestamp,
-        Lastdigit: lastDigit,
+        Lastdigit: last,
         "B/S": BS,
         Color
       });
