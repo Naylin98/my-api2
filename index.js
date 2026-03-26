@@ -20,13 +20,12 @@ app.get("/api/blocks54", async (req, res) => {
 
     const result = [];
 
+    // Main loop: check 54-sec ± tolerance
     for (let i = 1; i < blocks.length; i++) {
       const prev = blocks[i - 1];
-      const curr = blocks[i]; // 🔹 curr define
-
+      const curr = blocks[i];
       const diff = Math.abs(curr.timestamp - prev.timestamp) / 1000;
 
-      // Debug log
       console.log(`Block ${curr.number} interval: ${diff}s`);
 
       if (diff === 54) {
@@ -37,7 +36,7 @@ app.get("/api/blocks54", async (req, res) => {
         const IssueNumber = `${dateStr}0123${String(seq).padStart(4, "0")}`;
         seq = seq < 1440 ? seq + 1 : 1;
 
-        // 🔹 Convert timestamp to human-readable format
+        // Human-readable timestamp
         const ts = new Date(curr.timestamp);
         const humanTimestamp = `${ts.getFullYear()}-${String(ts.getMonth()+1).padStart(2,"0")}-${String(ts.getDate()).padStart(2,"0")} ${String(ts.getHours()).padStart(2,"0")}:${String(ts.getMinutes()).padStart(2,"0")}:${String(ts.getSeconds()).padStart(2,"0")}`;
 
@@ -45,7 +44,7 @@ app.get("/api/blocks54", async (req, res) => {
           IssueNumber,
           Blocknumber: curr.number,
           hash: curr.hash,
-          timestamp: humanTimestamp, // 🔹 human-readable
+          timestamp: humanTimestamp,
           Lastdigit: lastDigit,
           "B/S": BS,
           Color
@@ -53,11 +52,11 @@ app.get("/api/blocks54", async (req, res) => {
       }
     }
 
-    // Fallback: if no 54-sec blocks found, return latest blocks
+    // Fallback: return all blocks if no 54-sec blocks found
     if (result.length === 0) {
       console.log("No 54-sec blocks found, returning latest blocks for testing...");
       for (let i = 0; i < blocks.length; i++) {
-        const curr = blocks[i]; // 🔹 define curr
+        const curr = blocks[i];
         const lastDigit = curr.number % 10;
         const ts = new Date(curr.timestamp);
         const humanTimestamp = `${ts.getFullYear()}-${String(ts.getMonth()+1).padStart(2,"0")}-${String(ts.getDate()).padStart(2,"0")} ${String(ts.getHours()).padStart(2,"0")}:${String(ts.getMinutes()).padStart(2,"0")}:${String(ts.getSeconds()).padStart(2,"0")}`;
