@@ -72,14 +72,14 @@ async function updateBlocks() {
       const lastDigit = block.hash.replace(/\D/g, "");
       const last = lastDigit.slice(-1);
       const BS = last <= 4 ? "S" : "B";
-      let Color = "";
+      let color = "";
 
   if (last=== 0 || last === 5) {
-    Color = "Purple"; // ခရမ်း
+    color = "Purple"; // ခရမ်း
   } else if ([1, 3, 7, 9].includes(last)) {
-    Color = "Greenး"; // အစိမ်း
+    color = "Greenး"; // အစိမ်း
   } else if ([2, 4, 6, 8].includes(last)) {
-    Color = "Red"; // အနီ
+    color = "Red"; // အနီ
   }
 
       
@@ -157,7 +157,7 @@ app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
         timestamp: humanTimestamp,
         Lastdigit: last,
         "B/S": BS,
-        Color
+        Color:color
       });
     });
 
