@@ -74,14 +74,14 @@ if (!digits) return;
 
 const last = parseInt(digits.slice(-1)); // ✅ final digit (0-9)
       const BS = last <= 4 ? "S" : "B";
-     let Color = "";
+     let color = "";
 
 if (last === 0 || last === 5) {
-  Color = "ခရမ်း";
+  color = "ခရမ်း";
 } else if ([1, 3, 7, 9].includes(last)) {
-  Color = "အစိမ်း";
+  color = "အစိမ်း";
 } else if ([2, 4, 6, 8].includes(last)) {
-  Color = "အနီ";
+  color = "အနီ";
 }
 
       
