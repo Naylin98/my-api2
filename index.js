@@ -32,17 +32,17 @@ async function updateBlocks() {
 
       if (existingNumbers.has(block.number)) return;
 
-      const lastDigit = block.hashreplace(/\D/g, "");
+      const lastDigit = block.hash.replace(/\D/g, "");
       const last = lastDigit.slice(-1);
-      const BS = lastDigit <= 4 ? "S" : "B";
+      const BS = last <= 4 ? "S" : "B";
       const Color =  "";
 
-  if (lastDigit=== 0 || lastDigit === 5) {
-    color = "ခရမ်း"; // ခရမ်း
-  } else if ([1, 3, 7, 9].includes(lastDigit)) {
-    color = "အစိမ်း"; // အစိမ်း
-  } else if ([2, 4, 6, 8].includes(lastDigit)) {
-    color = "အနီ"; // အနီ
+  if (last=== 0 || last === 5) {
+    Color = "ခရမ်း"; // ခရမ်း
+  } else if ([1, 3, 7, 9].includes(last)) {
+    Color = "အစိမ်း"; // အစိမ်း
+  } else if ([2, 4, 6, 8].includes(last)) {
+    Color = "အနီ"; // အနီ
   }
 
       
