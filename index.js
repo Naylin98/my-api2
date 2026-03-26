@@ -72,7 +72,7 @@ async function updateBlocks() {
       const lastDigit = block.hash.replace(/\D/g, "");
       const last = lastDigit.slice(-1);
       const BS = last <= 4 ? "S" : "B";
-      const Color =  "";
+      let Color = "";
 
   if (last=== 0 || last === 5) {
     Color = "ခရမ်း"; // ခရမ်း
